@@ -1,8 +1,8 @@
-# Docker Development Environment with Semantic Versioning and Conventional Commits
+# Docker Development Environment for Semantic Versioning and Conventional Commits
 
 ## Introduction
 
-This guide outlines the steps to set up a Docker development environment that enforces Semantic Versioning and Conventional Commits. The environment will integrate various plugins and tools, along with the ChatGPT API, to ensure a standardized and efficient development workflow.
+This guide aims to help you set up a Docker development environment that enforces Semantic Versioning and Conventional Commits. By following these steps, you'll be able to develop your application within a Docker container, ensuring that you adhere to the conventions specified at [semver.org](https://semver.org) and [conventionalcommits.org](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## Prerequisites
 
@@ -12,28 +12,31 @@ This guide outlines the steps to set up a Docker development environment that en
 
 ## Step 1: Initialize Docker Dev Environment
 
-1. **Navigate to your project directory.**
+1. **Open your terminal and navigate to your project directory.**
     ```bash
     cd path/to/your/project
     ```
 
 2. **Create a Dockerfile for your development environment.**
     ```bash
-    touch Dockerfile
+    touch Dockerfile-DevEnvironment
     ```
-    Add the following content to the Dockerfile:
+    Open the Dockerfile-DevEnvironment in a text editor and add the following content:
     ```Dockerfile
-    # Base image
+    # Use an official Node runtime as base image
     FROM node:14
 
-    # Working directory
+    # Set the working directory in the container
     WORKDIR /usr/src/app
 
-    # Install dependencies
+    # Install app dependencies
     COPY package*.json ./
     RUN npm install
 
-    # Copy project files
+    # Install Semantic Versioning and Conventional Commits plugins
+    RUN npm install -g semantic-release @commitlint/{config-conventional,cli} commitizen
+
+    # Copy the current directory contents into the container
     COPY . .
     ```
 
@@ -41,59 +44,111 @@ This guide outlines the steps to set up a Docker development environment that en
     ```bash
     touch docker-compose.yaml
     ```
-    Add the following content to `docker-compose.yaml`:
+    Open the `docker-compose.yaml` in a text editor and add the following content:
     ```yaml
     version: "3.7"
     services:
       app:
         build:
           context: .
-          dockerfile: Dockerfile
+          dockerfile: Dockerfile-DevEnvironment
         ports:
           - "3000:3000"
+        volumes:
+            - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
     ```
 
 ---
 
-## Step 2: Install Plugins and Tools for Semantic Versioning and Conventional Commits
+## Step 2: Launch VSCode Dev Environment
 
-> **Note**: This section will be updated as we explore various plugins and tools.
+1. **Open Docker Desktop.**
+    Navigate to the Dev Environments tab.
 
-1. **Plugin/Tool 1**
-    - Description
-    - Installation Steps
+2. **Create a New Dev Environment.**
+    Click on the "New Environment" button and select your project directory where the `docker-compose.yaml` and `Dockerfile-DevEnvironment` are located.
 
-2. **Plugin/Tool 2**
-    - Description
-    - Installation Steps
-
----
-
-## Step 3: Integrate ChatGPT API
-
-> **Note**: This section will be updated as we integrate the ChatGPT API.
-
-1. **API Integration Step 1**
-    - Description
-
-2. **API Integration Step 2**
-    - Description
+3. **Launch VSCode.**
+    Once the environment is created, click on the "Open in VSCode" button. This will launch Visual Studio Code with the remote container extension, connecting it to your Docker container.
 
 ---
 
-## Step 4: Publish Docker Image to Docker Hub
+## Step 3: Install Dependencies Inside Docker Container
 
-1. **Log in to Docker Hub.**
+1. **Open Terminal in VSCode.**
+    Once VSCode is connected to your Docker container, open a new terminal window inside VSCode. This terminal will be running inside your Docker container.
+
+2. **Install Dependencies.**
+    Run the following command to install the dependencies specified in your `package.json`:
+    ```bash
+    npm install
+    ```
+
+---
+
+## Step 4: Configure Semantic Versioning and Conventional Commits
+
+1. **Initialize Commitizen.**
+    ```bash
+    commitizen init cz-conventional-changelog --save-dev --save-exact
+    ```
+
+2. **Configure Commitlint.**
+    Create a `commitlint.config.js` file and add the following content:
+    ```javascript
+    module.exports = {extends: ['@commitlint/config-conventional']};
+    ```
+
+3. **Set up Husky Hooks.**
+    Add the following hooks to your `package.json`:
+    ```json
+    "husky": {
+      "hooks": {
+        "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+      }
+    }
+    ```
+
+---
+
+## Step 5: Integrate with ChatGPT API
+
+1. **Install ChatGPT SDK.**
+    ```bash
+    npm install chatgpt-sdk
+    ```
+
+2. **Configure ChatGPT.**
+    Add your ChatGPT API keys and other configurations as environment variables or within your application code.
+
+---
+
+## Step 6: Publish Docker Image to Docker Hub
+
+1. **Log in to your Docker Hub account.**
     ```bash
     docker login
     ```
 
-2. **Tag the Docker image.**
+2. **Tag your Docker image.**
     ```bash
     docker tag local-image-name:tagname new-repo-name:tagname
     ```
 
-3. **Push the Docker image.**
+3. **Push the Docker image to your Docker Hub repository.**
     ```bash
     docker push new-repo-name:tagname
     ```
+
+---
+
+## Step 7: Share Dev Environment
+
+1. **Generate Shareable Link.**
+    If the "Share" button is not available in Docker Desktop, you can create a manual link:
+    ```bash
+    https://open.docker.com/dashboard/dev-envs?url=https://github.com/Malnati/docker-dev-semver
+    ```
+
+2. **Update GitHub Repository.**
+    Add this shareable link to your GitHub repository
