@@ -20,4 +20,7 @@ RUN git config --global user.name "Malnati"
 RUN git config --global user.email "ricardomalnati@gmail.com"
 RUN git config --global --add safe.directory /com.docker.devenvironments.code
 
+# Configure Git Trailers
+RUN echo -e "[trailers]\n\tkey = \"Signed-off-by: \"\n\tvalue = \"Your Name <youremail@example.com>\"" >> /root/.gitconfig
+
 CMD ["npm", "start"]
