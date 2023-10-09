@@ -9,8 +9,8 @@ This guide aims to help you set up a Docker development environment that enforce
 - Docker Desktop installed on a Unix-compatible system
 - Visual Studio Code installed
 - Git installed
-- Generate a new SSH key and add it to the SSH agent by following these instructions.
-- Add the new SSH key to your GitHub account by following these instructions.
+- Generate a new SSH key and add it to the SSH agent by following [these instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key).
+- Add the new SSH key to your GitHub account by following [these instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account#adding-a-new-ssh-key-to-your-account).
 
 ## Step 1: Initialize Docker Dev Environment
 
