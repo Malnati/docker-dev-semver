@@ -24,4 +24,5 @@ RUN echo "[trailers]" >> /root/.gitconfig && \
 # Copy the current directory contents into the container
 COPY . .
 
+CMD ["npx commitgpt -c"]
 CMD ["npm", "start"]
