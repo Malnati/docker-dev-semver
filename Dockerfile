@@ -14,5 +14,8 @@ RUN npm install -g semantic-release @commitlint/config-conventional @commitlint/
 # Copy the current directory contents into the container
 COPY . .
 
+# Git configuration (Optional)
+RUN git config --global --add safe.directory /com.docker.devenvironments.code
+
 CMD ["npm", "start"]
 
