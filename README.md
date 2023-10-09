@@ -1,7 +1,3 @@
-Certainly, Ricardo. Below is the updated content for your `README.md` file. The changes include instructions for creating a `package.json` file, as well as adjustments for compatibility with Unix-based systems.
-
----
-
 # Docker Development Environment for Semantic Versioning and Conventional Commits
 
 ## Introduction
@@ -10,7 +6,7 @@ This guide aims to help you set up a Docker development environment that enforce
 
 ## Prerequisites
 
-- Docker installed on a Unix-compatible system
+- Docker Desktop installed on a Unix-compatible system
 - Visual Studio Code installed
 - Git installed
 
@@ -21,12 +17,29 @@ This guide aims to help you set up a Docker development environment that enforce
     cd path/to/your/project
     ```
 
-2. **Initialize a new Node.js project.**
-    ```bash
-    npm init -y
+2. **Create a `package.json` file with the following content:**
+    ```json
+    {
+      "name": "docker-dev-semver",
+      "version": "1.0.0",
+      "description": "## Introduction",
+      "main": "index.js",
+      "scripts": {
+        "start": "node index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "keywords": [],
+      "author": "",
+      "license": "ISC"
+    }
     ```
 
-3. **Create a Dockerfile for your development environment.**
+3. **Create an `index.js` file with the following content:**
+    ```javascript
+    console.log("Hello, world!");
+    ```
+
+4. **Create a Dockerfile for your development environment.**
     ```bash
     touch Dockerfile
     ```
@@ -43,13 +56,15 @@ This guide aims to help you set up a Docker development environment that enforce
     RUN npm install
 
     # Install Semantic Versioning and Conventional Commits plugins
-    RUN npm install -g semantic-release @commitlint/{config-conventional,cli} commitizen
+    RUN npm install -g semantic-release @commitlint/config-conventional @commitlint/cli commitizen
 
     # Copy the current directory contents into the container
     COPY . .
+
+    CMD ["npm", "start"]
     ```
 
-4. **Create a `docker-compose.yaml` file.**
+5. **Create a `docker-compose.yaml` file.**
     ```bash
     touch docker-compose.yaml
     ```
@@ -64,7 +79,12 @@ This guide aims to help you set up a Docker development environment that enforce
         ports:
           - "3000:3000"
         volumes:
-          - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+            - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+    ```
+
+6. **Build and run your Docker container.**
+    ```bash
+    docker-compose up --build
     ```
 
 ---
