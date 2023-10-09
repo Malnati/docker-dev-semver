@@ -18,6 +18,9 @@ This guide aims to help you set up a Docker development environment that enforce
     ```
 
 2. **Create a `package.json` file with the following content:**
+    ```bash
+    touch package.json
+    ```
     ```json
     {
       "name": "docker-dev-semver",
@@ -86,6 +89,13 @@ This guide aims to help you set up a Docker development environment that enforce
     ```bash
     docker-compose up --build
     ```
+
+7. **Create a Shareable Docker Dev Environment Link.**
+    Generate a shareable link for your Docker Dev Environment like the following:
+    ```bash
+    https://open.docker.com/dashboard/dev-envs?url=https://github.com/YourUsername/YourRepoName
+    ```
+    Replace `YourUsername` and `YourRepoName` with your GitHub username and repository name, respectively.
 
 ---
 
