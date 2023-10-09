@@ -15,7 +15,9 @@ RUN npm install -g semantic-release @commitlint/config-conventional @commitlint/
 COPY . .
 
 # Git configuration (Optional)
+# Git configuration (Optional)
+RUN git config --global user.name "Malnati"
+RUN git config --global user.email "ricardomalnati@gmail.com"
 RUN git config --global --add safe.directory /com.docker.devenvironments.code
 
 CMD ["npm", "start"]
-
