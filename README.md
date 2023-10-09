@@ -60,6 +60,13 @@ This guide aims to help you set up a Docker development environment that enforce
     COPY package*.json ./
     RUN npm install
 
+    # CommitGPT Configuration
+    RUN echo '{\n  "model": "text-davinci-003",\n  "temperature": 0.5,\n  "maxTokens": 2048\n}' > /usr/src/app/.commitgpt.json
+    RUN echo 'suggest 10 commit messages based on the following diff:\n{{diff}}\ncommit messages should:\n - follow conventional commits\n - message format should be: <type>[scope]: <description>\nexamples:\n - fix(authentication): add password regex pattern\n - feat(storage): add new test cases' > /usr/src/app/.commitgpt-template
+
+    # Set OpenAI API Key as an environment variable
+    ENV OPENAI_API_KEY=your-openai-api-key
+
     # Install Semantic Versioning and Conventional Commits plugins
     RUN npm install -g semantic-release @commitlint/config-conventional @commitlint/cli commitizen
 
@@ -68,12 +75,17 @@ This guide aims to help you set up a Docker development environment that enforce
     RUN git config --global user.email "youremail@example.com"
     RUN git config --global --add safe.directory /com.docker.devenvironments.code
 
+    # Configure Git Trailers
+    RUN echo "[trailers]" >> /root/.gitconfig && \
+        echo "    key = \"Signed-off-by: \"" >> /root/.gitconfig && \
+        echo "    value = \"Your Name <youremail@example.com>\"" >> /root/.gitconfig
+
     # Copy the current directory contents into the container
     COPY . .
 
     CMD ["npm", "start"]
     ```
-
+    
 5. **Create a `docker-compose.yaml` file.**
     ```bash
     touch docker-compose.yaml
