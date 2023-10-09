@@ -1,3 +1,7 @@
+Certainly, Ricardo. Below is the updated content for your `README.md` file. The changes include instructions for creating a `package.json` file, as well as adjustments for compatibility with Unix-based systems.
+
+---
+
 # Docker Development Environment for Semantic Versioning and Conventional Commits
 
 ## Introduction
@@ -6,7 +10,7 @@ This guide aims to help you set up a Docker development environment that enforce
 
 ## Prerequisites
 
-- Docker Desktop installed on your MacBook Air M2
+- Docker installed on a Unix-compatible system
 - Visual Studio Code installed
 - Git installed
 
@@ -17,11 +21,16 @@ This guide aims to help you set up a Docker development environment that enforce
     cd path/to/your/project
     ```
 
-2. **Create a Dockerfile for your development environment.**
+2. **Initialize a new Node.js project.**
     ```bash
-    touch Dockerfile-DevEnvironment
+    npm init -y
     ```
-    Open the Dockerfile-DevEnvironment in a text editor and add the following content:
+
+3. **Create a Dockerfile for your development environment.**
+    ```bash
+    touch Dockerfile
+    ```
+    Open the Dockerfile in a text editor and add the following content:
     ```Dockerfile
     # Use an official Node runtime as base image
     FROM node:14
@@ -40,7 +49,7 @@ This guide aims to help you set up a Docker development environment that enforce
     COPY . .
     ```
 
-3. **Create a `docker-compose.yaml` file.**
+4. **Create a `docker-compose.yaml` file.**
     ```bash
     touch docker-compose.yaml
     ```
@@ -51,11 +60,11 @@ This guide aims to help you set up a Docker development environment that enforce
       app:
         build:
           context: .
-          dockerfile: Dockerfile-DevEnvironment
+          dockerfile: Dockerfile
         ports:
           - "3000:3000"
         volumes:
-            - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+          - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
     ```
 
 ---
