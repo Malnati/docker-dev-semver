@@ -152,3 +152,30 @@ This guide aims to help you set up a Docker development environment that enforce
 
 2. **Update GitHub Repository.**
     Add this shareable link to your GitHub repository
+
+---
+
+## Step 8: Utilize Git Trailers for Metadata
+
+Git Trailers allow you to append metadata to your commit messages, which can be useful for tracking issues, authors, and other information. For more details, refer to the official [Git Trailers documentation](https://git-scm.com/docs/git-interpret-trailers).
+
+1. **Install Git Trailers.**
+    Git Trailers are built into Git, so no additional installation is required.
+
+2. **Configure Git Trailers.**
+    You can configure Git Trailers in your `.gitconfig` or within the repository's `.git/config` file. Here's an example:
+    ```ini
+    [trailers]
+        key = "Signed-off-by: "
+        value = "Your Name <youremail@example.com>"
+    ```
+
+3. **Use Git Trailers in Commit Messages.**
+    When you make a commit, you can include trailers at the end of your commit message like so:
+    ```text
+    feat: add new feature
+
+    Signed-off-by: Your Name <youremail@example.com>
+    ```
+
+---
