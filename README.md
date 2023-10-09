@@ -62,6 +62,8 @@ This guide aims to help you set up a Docker development environment that enforce
     RUN npm install -g semantic-release @commitlint/config-conventional @commitlint/cli commitizen
 
     # Git configuration (Optional)
+    RUN git config --global user.name "Your Name"
+    RUN git config --global user.email "youremail@example.com"
     RUN git config --global --add safe.directory /com.docker.devenvironments.code
 
     # Copy the current directory contents into the container
