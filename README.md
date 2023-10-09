@@ -61,6 +61,9 @@ This guide aims to help you set up a Docker development environment that enforce
     # Install Semantic Versioning and Conventional Commits plugins
     RUN npm install -g semantic-release @commitlint/config-conventional @commitlint/cli commitizen
 
+    # Git configuration (Optional)
+    RUN git config --global --add safe.directory /com.docker.devenvironments.code
+
     # Copy the current directory contents into the container
     COPY . .
 
