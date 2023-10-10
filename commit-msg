@@ -14,9 +14,6 @@ if ! command -v jq &> /dev/null; then
     exit 1
 fi
 
-# OpenAI Key
-OPENAI_KEY="***"
-
 # File where the commit message is stored
 COMMIT_MSG_FILE=$1
 
