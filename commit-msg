@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Verify if required utilities are installed
+if ! command -v curl &> /dev/null; then
+    echo "Error: curl is not installed. Exiting."
+    exit 1
+fi
+
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is not installed. Exiting."
+    exit 1
+fi
+
+# File where the commit message is stored
+COMMIT_MSG_FILE=$1
+
+# Capture the original commit message
+ORIGINAL_COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
+
+# Capture the changes staged for commit
+DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
+
+# Initialize a variable to store the semantic versioning suggestion
+SEMVER_SUGGESTION=""
+
+# Make an API call to ChatGPT for analysis (Replace YOUR_API_KEY and other placeholders)
+API_RESPONSE=$(curl -s -H "Authorization: Bearer YOUR_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "{\"prompt\":\"Analyze commit for semantic versioning: $DIFF_OUTPUT\",\"max_tokens\":50}" \
+    "https://api.openai.com/v1/engines/davinci-codex/completions")
+
+# Extract the suggestion from the API response (you may need to adjust this depending on the actual API response format)
+SEMVER_SUGGESTION=$(echo $API_RESPONSE | jq -r '.choices[0].text')
+
+# Append the semantic versioning suggestion to the original commit message
+echo "$ORIGINAL_COMMIT_MSG ($SEMVER_SUGGESTION)" > $COMMIT_MSG_FILE
