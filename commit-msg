@@ -29,8 +29,14 @@ API_RESPONSE=$(curl -s -H "Authorization: Bearer YOUR_API_KEY" \
     -d "{\"prompt\":\"Analyze commit for semantic versioning: $DIFF_OUTPUT\",\"max_tokens\":50}" \
     "https://api.openai.com/v1/engines/davinci-codex/completions")
 
-# Extract the suggestion from the API response (you may need to adjust this depending on the actual API response format)
+# Debug: Print API response
+echo "API Response: $API_RESPONSE"
+
+# Extract the suggestion from the API response
 SEMVER_SUGGESTION=$(echo $API_RESPONSE | jq -r '.choices[0].text')
+
+# Debug: Print extracted suggestion
+echo "Extracted Suggestion: $SEMVER_SUGGESTION"
 
 # Append the semantic versioning suggestion to the original commit message
 echo "$ORIGINAL_COMMIT_MSG ($SEMVER_SUGGESTION)" > $COMMIT_MSG_FILE
