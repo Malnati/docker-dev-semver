@@ -1,2 +1,1 @@
 NODE_SUGGESTION=$(node ../../commit-msg.js)
-echo $NODE_SUGGESTION
