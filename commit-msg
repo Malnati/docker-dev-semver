@@ -40,3 +40,5 @@ echo "Extracted Suggestion: $SEMVER_SUGGESTION"
 
 # Append the semantic versioning suggestion to the original commit message
 echo "$ORIGINAL_COMMIT_MSG ($SEMVER_SUGGESTION)" > $COMMIT_MSG_FILE
+
+# testing 
