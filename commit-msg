@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # OpenAI Key
-API_KEY="???"
+API_KEY="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"
 
 # Verify if required utilities are installed
 if ! command -v curl &> /dev/null; then
@@ -21,7 +21,7 @@ COMMIT_MSG_FILE=$1
 ORIGINAL_COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
 
 # Capture the changes staged for commit
-DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)     
+DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
 
 # Initialize a variable to store the semantic versioning suggestion
 SEMVER_SUGGESTION=""
@@ -32,16 +32,16 @@ ESCAPED_DIFF_OUTPUT=$(echo "$DIFF_OUTPUT" | jq -R -s -c .)
 # Construct the JSON payload
 JSON_PAYLOAD="{\"prompt\":\"Analyze commit for semantic versioning: $ESCAPED_DIFF_OUTPUT\",\"max_tokens\":50}"
 
-# Make an API call to ChatGPT for analysis
+# Make an API call to GPT-4 for analysis
 API_RESPONSE=$(curl -s -H "Authorization: Bearer ${API_KEY}" \
     -H "Content-Type: application/json" \
     -d "$JSON_PAYLOAD" \
-    "https://api.openai.com/v1/engines/davinci-codex/completions")
+    "https://api.openai.com/v1/chat/completions")
 
 # Debug: Print API response
 echo "API Response: $API_RESPONSE"
 
-# Extract the suggestion from the API response
+# Extract the suggestion from the API response using jq
 SEMVER_SUGGESTION=$(echo $API_RESPONSE | jq -r '.choices[0].text')
 
 # Debug: Print extracted suggestion
