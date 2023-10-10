@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # OpenAI Key
-API_KEY="***"
+API_KEY="???"
 
 # Verify if required utilities are installed
 if ! command -v curl &> /dev/null; then
