@@ -23,10 +23,13 @@ DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
 # Initialize a variable to store the semantic versioning suggestion
 SEMVER_SUGGESTION=""
 
+# Properly escape the DIFF_OUTPUT using jq
+ESCAPED_DIFF_OUTPUT=$(echo "$DIFF_OUTPUT" | jq -R -s -c .)
+
 # Make an API call to ChatGPT for analysis (Replace YOUR_API_KEY and other placeholders)
 API_RESPONSE=$(curl -s -H "Authorization: Bearer YOUR_API_KEY" \
     -H "Content-Type: application/json" \
-    -d "{\"prompt\":\"Analyze commit for semantic versioning: $DIFF_OUTPUT\",\"max_tokens\":50}" \
+    -d "{\"prompt\":\"Analyze commit for semantic versioning: $ESCAPED_DIFF_OUTPUT\",\"max_tokens\":50}" \
     "https://api.openai.com/v1/engines/davinci-codex/completions")
 
 # Debug: Print API response
