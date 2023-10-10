@@ -11,6 +11,9 @@ if ! command -v jq &> /dev/null; then
     exit 1
 fi
 
+# OpenAI Key
+OPENAI_KEY="***"
+
 # File where the commit message is stored
 COMMIT_MSG_FILE=$1
 
@@ -26,10 +29,13 @@ SEMVER_SUGGESTION=""
 # Properly escape the DIFF_OUTPUT using jq
 ESCAPED_DIFF_OUTPUT=$(echo "$DIFF_OUTPUT" | jq -R -s -c .)
 
-# Make an API call to ChatGPT for analysis (Replace YOUR_API_KEY and other placeholders)
-API_RESPONSE=$(curl -s -H "Authorization: Bearer YOUR_API_KEY" \
+# Construct the JSON payload
+JSON_PAYLOAD="{\"prompt\":\"Analyze commit for semantic versioning: $ESCAPED_DIFF_OUTPUT\",\"max_tokens\":50}"
+
+# Make an API call to ChatGPT for analysis
+API_RESPONSE=$(curl -s -H "Authorization: Bearer $OPENAI_KEY" \
     -H "Content-Type: application/json" \
-    -d "{\"prompt\":\"Analyze commit for semantic versioning: $ESCAPED_DIFF_OUTPUT\",\"max_tokens\":50}" \
+    -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/engines/davinci-codex/completions")
 
 # Debug: Print API response
@@ -43,5 +49,3 @@ echo "Extracted Suggestion: $SEMVER_SUGGESTION"
 
 # Append the semantic versioning suggestion to the original commit message
 echo "$ORIGINAL_COMMIT_MSG ($SEMVER_SUGGESTION)" > $COMMIT_MSG_FILE
-
-# testing 
