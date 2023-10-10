@@ -1,2 +1,9 @@
-NODE_SUGGESTION=$(node ../../commit-msg.js)
+# Get the directory of the currently executing script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+echo $DIR
+
+# Use it to construct the full path to commit-msg.js
+NODE_SUGGESTION=$(node "$DIR/../../../commit-msg.js")
+
 echo $NODE_SUGGESTION
