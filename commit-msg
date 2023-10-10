@@ -29,8 +29,8 @@ SEMVER_SUGGESTION=""
 # Properly escape the DIFF_OUTPUT using jq
 ESCAPED_DIFF_OUTPUT=$(echo "$DIFF_OUTPUT" | jq -R -s -c . --unbuffered)
 
-# Construct the JSON payload
-JSON_PAYLOAD="{\"prompt\":\"Analyze commit for semantic versioning: $ESCAPED_DIFF_OUTPUT\",\"max_tokens\":50}"
+# Construct the JSON payload using printf for proper escaping
+JSON_PAYLOAD=$(printf '{"prompt":"Analyze commit for semantic versioning: %s","max_tokens":50}' "$ESCAPED_DIFF_OUTPUT")
 
 # Make an API call to GPT-3.5 for analysis
 API_RESPONSE=$(curl -s -H "Authorization: Bearer ${API_KEY}" \
