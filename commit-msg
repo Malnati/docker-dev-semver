@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# OpenAI Key
+API_KEY="***"
+
 # Verify if required utilities are installed
 if ! command -v curl &> /dev/null; then
     echo "Error: curl is not installed. Exiting."
@@ -33,7 +36,7 @@ ESCAPED_DIFF_OUTPUT=$(echo "$DIFF_OUTPUT" | jq -R -s -c .)
 JSON_PAYLOAD="{\"prompt\":\"Analyze commit for semantic versioning: $ESCAPED_DIFF_OUTPUT\",\"max_tokens\":50}"
 
 # Make an API call to ChatGPT for analysis
-API_RESPONSE=$(curl -s -H "Authorization: Bearer $OPENAI_KEY" \
+API_RESPONSE=$(curl -s -H "Authorization: Bearer ${API_KEY}" \
     -H "Content-Type: application/json" \
     -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/engines/davinci-codex/completions")
