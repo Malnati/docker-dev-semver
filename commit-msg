@@ -21,7 +21,7 @@ COMMIT_MSG_FILE=$1
 ORIGINAL_COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
 
 # Capture the changes staged for commit
-DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
+DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)     
 
 # Initialize a variable to store the semantic versioning suggestion
 SEMVER_SUGGESTION=""
