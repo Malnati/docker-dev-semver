@@ -25,6 +25,7 @@ RUN echo "[trailers]" >> /root/.gitconfig && \
     echo "    key = \"Signed-off-by: \"" >> /root/.gitconfig && \
     echo "    value = \"Your Name <youremail@example.com>\"" >> /root/.gitconfig
 
+RUN echo API_KEY=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 >> /etc/profile
 # Copy the current directory contents into the container
 COPY . .
 

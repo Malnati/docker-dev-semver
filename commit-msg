@@ -1,3 +1,79 @@
 #!/bin/bash
+# Author: Ricardo Malnati
+# Creation Date: 2023-10-10
+# Description: To analyze the commit content and suggest a semantic versioning tag.
+# Dependencies: curl, jq, base64
 
-NODE_SUGGESTION=$(./analyzeCommit.js /path/to/git-diff-cached-diff.logs)
+# Set API Key
+API_KEY="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"
+
+# Verify if required utilities are installed
+for util in curl jq base64; do
+    if ! command -v $util &> /dev/null; then
+        echo "Error: $util is not installed. Exiting."
+        exit 1
+    fi
+done
+
+# File where the commit message is stored
+COMMIT_MSG_FILE="$1"
+if [ -z "$COMMIT_MSG_FILE" ]; then
+    echo "Error: Commit message file not provided."
+    exit 1
+fi
+
+# Capture the original commit message
+ORIGINAL_COMMIT_MSG=$(cat "$COMMIT_MSG_FILE" 2>/dev/null)
+if [ $? -ne 0 ]; then
+    echo "Error: Could not read commit message file."
+    exit 1
+fi
+
+# Capture the changes staged for commit
+DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
+
+# Encode DIFF_OUTPUT in base64 to avoid JSON issues
+DIFF_OUTPUT_BASE64=$(echo "$DIFF_OUTPUT" | base64)
+
+# Initialize a variable to store the semantic versioning suggestion
+SEMVER_SUGGESTION=""
+
+# Prepare the JSON payload
+JSON_PAYLOAD=$(cat <<EOF
+{
+  "model": "gpt-3.5-turbo-16k",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "Analyze commit for semantic versioning: $DIFF_OUTPUT_BASE64"
+    }
+  ]
+}
+EOF
+)
+
+# Make an API call to ChatGPT for analysis
+API_RESPONSE=$(curl -s -H "Authorization: Bearer $API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "$JSON_PAYLOAD" \
+    "https://api.openai.com/v1/chat/completions")
+
+# Extract the suggestion from the API response
+SEMVER_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
+
+# Check if SEMVER_SUGGESTION is empty
+if [ -z "$SEMVER_SUGGESTION" ]; then
+    echo "Error: Semantic versioning suggestion is empty."
+    exit 1
+fi
+
+# Append the semantic versioning suggestion to the original commit message
+echo "$ORIGINAL_COMMIT_MSG ($SEMVER_SUGGESTION)" > "$COMMIT_MSG_FILE"
+if [ $? -ne 0 ]; then
+    echo "Error: Could not write to commit message file."
+    exit 1
+fi
