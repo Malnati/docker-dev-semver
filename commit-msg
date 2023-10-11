@@ -93,3 +93,4 @@ if [ $? -ne 0 ]; then
     echo "Error: Could not write to commit message file."
     exit 1
 fi
+
