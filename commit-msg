@@ -29,6 +29,13 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Verify API Key by making a simple API call
+API_TEST=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $API_KEY" "https://api.openai.com/v1/engines")
+if [ "$API_TEST" -ne 200 ]; then
+  echo "Error: Invalid API Key. Exiting."
+  exit 1
+fi 
+
 # Capture the changes staged for commit
 DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
 
@@ -57,10 +64,19 @@ EOF
 )
 
 # Make an API call to ChatGPT for analysis
-API_RESPONSE=$(curl -s -H "Authorization: Bearer $API_KEY" \
+API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -H "Authorization: Bearer $API_KEY" \
     -H "Content-Type: application/json" \
     -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
+
+# Extract HTTP status code
+HTTP_STATUS=$(echo "$API_RESPONSE" | awk -F': ' '/^HTTP_STATUS/{print $2}')
+
+# Log if API call failed
+if [ "$HTTP_STATUS" -ne 200 ]; then
+  echo "Error: API call failed with status $HTTP_STATUS"
+  exit 1
+fi
 
 # Extract the suggestion from the API response
 SEMVER_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
