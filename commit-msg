@@ -87,3 +87,28 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Determine the type based on the suggestion (e.g., feat, fix, chore)
+COMMIT_TYPE="feat"  # Replace this with logic to determine the type
+
+# Optional: Determine the scope (e.g., $location, $browser)
+COMMIT_SCOPE="scope"  # Replace this with logic to determine the scope
+
+# Subject and Body
+COMMIT_SUBJECT="Implement semantic versioning based on git diff"
+COMMIT_BODY="This commit uses the git diff output to suggest a semantic versioning tag. The suggestion is: $SEMVER_SUGGESTION"
+
+# Footer (Optional)
+COMMIT_FOOTER=""  # Add any footer content like "BREAKING CHANGE: ..."
+
+# Format the commit message
+COMMIT_MSG=$(cat <<EOF
+$COMMIT_TYPE($COMMIT_SCOPE): $COMMIT_SUBJECT
+
+$COMMIT_BODY
+
+$COMMIT_FOOTER
+EOF
+)
+
+# Write the formatted commit message to the commit message file
+echo "$COMMIT_MSG" > "$COMMIT_MSG_FILE"
