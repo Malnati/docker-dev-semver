@@ -52,6 +52,7 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
 
+echo "Debug: Entire API Request: $JSON_PAYLOAD"
 echo "Debug: Entire API Response: $API_RESPONSE"
 exit 0
 
