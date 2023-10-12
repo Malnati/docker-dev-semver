@@ -42,7 +42,7 @@ DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
                   --arg model "gpt-3.5-turbo-16k" \
-                  --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a short sentence of one line with maximun of 1024 characteres." \
+                  --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a short sentence of one line with maximun of 256 characteres." \
                   --arg user_content "Based on the following git diff output, identify and describe the changes to define the type of the commit message: $DIFF_OUTPUT" \
                   '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
 
@@ -53,7 +53,7 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     "https://api.openai.com/v1/chat/completions")
 
 #echo "Debug
-echo "Debug: Entire API Response: $API_RESPONSE"
+echo "Debug: JSON to be parsed: $API_RESPONSE"
 
 # Extract the commit message from the API response
 COMMIT_JSON=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
@@ -64,7 +64,7 @@ COMMIT_TYPE=$COMMIT_JSON
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
                   --arg model "gpt-3.5-turbo-16k" \
-                  --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a short sentence of one line with maximun of 1024 characteres." \
+                  --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a short sentence of one line with maximun of 256 characteres." \
                   --arg user_content "Based on the following git diff output, identify and describe the changes to define the scopr of the commit messaget: $DIFF_OUTPUT" \
                   '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
 
@@ -75,7 +75,7 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     "https://api.openai.com/v1/chat/completions")
 
 #echo "Debug
-echo "Debug: Entire API Response: $API_RESPONSE"
+echo "Debug: JSON to be parsed: $API_RESPONSE"
 
 # Extract the commit message from the API response
 COMMIT_JSON=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
@@ -97,13 +97,21 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     "https://api.openai.com/v1/chat/completions")
 
 #echo "Debug
-echo "Debug: Entire API Response: $API_RESPONSE"
+echo "Debug: JSON to be parsed: $API_RESPONSE"
 
 # Parse the JSON to populate the variables
 COMMIT_FOOTER=$COMMIT_JSON
 
+if [ "$COMMIT_TYPE" == "feat" ]; then
+    SEMVER="minor"
+elif [ "$COMMIT_TYPE" == "fix" ]; then
+    SEMVER="patch"
+else
+    SEMVER="patch"
+fi
+
 # Update the commit message
-echo "$COMMIT_TYPE: $COMMIT_SCOPE - $COMMIT_FOOTER" > "$COMMIT_MSG_FILE"
+echo "$COMMIT_TYPE($COMMIT_SCOPE): $COMMIT_FOOTER - Semantic Version: $SEMVER" > "$COMMIT_MSG_FILE"
 
 exit 0
 
