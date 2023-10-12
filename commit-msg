@@ -61,7 +61,7 @@ DESCRIPTON_4096_SUGGESTION=$(echo "$API_FROM_DIFF_OUTPUT_RESPONSE" | jq -r '.cho
 #echo "Debug: DESCRIPTON_4096_SUGGESTION
 echo "Begin Debug: DESCRIPTON_4096_SUGGESTION:"
 echo $DESCRIPTON_4096_SUGGESTION
-echo "End Debug: DESCRIPTON_4096_SUGGESTION"
+echo "End Debug"
 
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
@@ -82,7 +82,7 @@ COMMIT_TYPE_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.conte
 #echo "Debug: COMMIT_TYPE_SUGGESTION
 echo "Begin Debug: COMMIT_TYPE_SUGGESTION:"
 echo $COMMIT_TYPE_SUGGESTION
-echo "End Debug: COMMIT_TYPE_SUGGESTION"
+echo "End Debug"
 
 # Parse the JSON to populate the variables
 COMMIT_TYPE=$COMMIT_TYPE_SUGGESTION
@@ -106,7 +106,7 @@ COMMIT_SCOPE_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.cont
 #echo "Debug: COMMIT_SCOPE_SUGGESTION
 echo "Begin Debug: COMMIT_SCOPE_SUGGESTION:"
 echo $COMMIT_SCOPE_SUGGESTION
-echo "End Debug: COMMIT_SCOPE_SUGGESTION"
+echo "End Debug"
 
 # Parse the JSON to populate the variables
 COMMIT_SCOPE=$COMMIT_SCOPE_SUGGESTION
@@ -128,9 +128,9 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
 COMMIT_FOOTER_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
 
 #echo "Debug: COMMIT_FOOTER_SUGGESTION
-echo "Debug: COMMIT_FOOTER_SUGGESTION:"
+echo "Begin Debug: COMMIT_FOOTER_SUGGESTION:"
 echo $COMMIT_FOOTER_SUGGESTION
-echo "Debug: COMMIT_FOOTER_SUGGESTION"
+echo "End Debug"
 
 # Parse the JSON to populate the variables
 COMMIT_FOOTER=$COMMIT_FOOTER_SUGGESTION
@@ -147,4 +147,3 @@ fi
 echo "$COMMIT_TYPE($COMMIT_SCOPE): $COMMIT_FOOTER - Semantic Version: $SEMVER" > "$COMMIT_MSG_FILE"
 
 exit 0
-
