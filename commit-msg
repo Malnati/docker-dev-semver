@@ -52,25 +52,23 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
 
-echo "Debug: Entire API Request: $JSON_PAYLOAD"
+#echo "Debug: Entire API Request: $JSON_PAYLOAD"
 echo "Debug: Entire API Response: $API_RESPONSE"
+
+# Extract the JSON-formatted commit message from the API response
+COMMIT_JSON=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
+
+# Parse the JSON to populate the variables
+COMMIT_TYPE=$(echo "$COMMIT_JSON" | jq -r '.type')
+COMMIT_SCOPE=$(echo "$COMMIT_JSON" | jq -r '.scope')
+COMMIT_FOOTER=$(echo "$COMMIT_JSON" | jq -r '.footer')
+
+echo "COMMIT_TYPE: $COMMIT_TYPE"
+echo "COMMIT_SCOPE $COMMIT_SCOPE"
+echo "COMMIT_FOOTER $COMMIT_FOOTER"
+
 exit 0
-
-# Extract HTTP status code
-HTTP_STATUS=$(echo "$API_RESPONSE" | grep 'HTTP_STATUS/{print $2}')
-
-# Log if API call failed
-if [ -z "$HTTP_STATUS" ]; then
-  echo "Error: API call failed, no HTTP status received."
-  # Debug: Print entire API 
-  echo "Debug: Entire API Response: $API_RESPONSE"
-  exit 1
-elif [ "$HTTP_STATUS" -ne 200 ]; then
-  echo "Error: API call failed with status $HTTP_STATUS"
-  # Debug: Print entire API 
-  echo "Debug: Entire API Response: $API_RESPONSE"
-  exit 1
-fi
+# Now, you can use these variables in your logic
 
 # Extract the suggestion from the API response
 SEMVER_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
