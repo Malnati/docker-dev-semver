@@ -55,12 +55,16 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
 #echo "Debug
 echo "Debug: Entire API Response: $API_RESPONSE"
 
-IFS=',' read -ra COMMIT_FIELDS <<< "$API_RESPONSE"
-COMMIT_TYPE="${COMMIT_FIELDS[0]}"
-COMMIT_SCOPE="${COMMIT_FIELDS[1]}"
-COMMIT_FOOTER="${COMMIT_FIELDS[4]}"
+# Extract the commit message from the API response
+COMMIT_JSON=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
+
+# Parse the JSON to populate the variables
+COMMIT_TYPE=$(echo "$COMMIT_JSON" | jq -r '.type')
+COMMIT_SCOPE=$(echo "$COMMIT_JSON" | jq -r '.scope')
+COMMIT_FOOTER=$(echo "$COMMIT_JSON" | jq -r '.footer')
 
 # Update the commit message
 echo "$COMMIT_TYPE: $COMMIT_SCOPE - $COMMIT_FOOTER" > "$COMMIT_MSG_FILE"
 
 exit 0
+
