@@ -55,9 +55,6 @@ API_FROM_DIFF_OUTPUT_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Au
     -d "$JSON_DIFF_OUTPUT_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
 
-#echo "Debug: Response
-#echo "Debug: Response: $API_FROM_DIFF_OUTPUT_RESPONSE"
-
 # Extract the commit message from the API response
 DESCRIPTON_4096_SUGGESTION=$(echo "$API_FROM_DIFF_OUTPUT_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
 
@@ -77,9 +74,8 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
 
-
-#echo "Debug: Response
-#echo "Debug: Response: $API_RESPONSE"
+#echo "End Debug: DESCRIPTON_4096_SUGGESTION
+echo "End Debug: DESCRIPTON_4096_SUGGESTION"
 
 # Extract the commit type from the API response
 COMMIT_TYPE_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
@@ -103,8 +99,8 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
 
-#echo "Debug
-#echo "Debug: JSON to be parsed: $API_RESPONSE"
+#echo "End Debug: DESCRIPTON_4096_SUGGESTION
+echo "End Debug: DESCRIPTON_4096_SUGGESTION"
 
 # Extract the commit scope from the API response
 COMMIT_SCOPE_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
@@ -128,8 +124,8 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
 
-#echo "Debug
-#echo "Debug: JSON to be parsed: $API_RESPONSE"
+#echo "End Debug: DESCRIPTON_4096_SUGGESTION
+echo "End Debug: DESCRIPTON_4096_SUGGESTION"
 
 # Extract the commit footer from the API response
 COMMIT_FOOTER_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
