@@ -42,7 +42,7 @@ DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
                   --arg model "gpt-3.5-turbo-16k" \
-                  --arg sys_content "You are a helpful system programmed to generate a JSON-formatted commit message based on git diff output. Please provide only the JSON object containing the commit type, scope, subject, body, and footer." \
+                  --arg sys_content "You are a helpful system programmed to generate a JSON-formatted commit message based on git diff output. Please provide only the JSON object containing the commit type, scope, subject, body, and footer. End of Line marks are not desired." \
                   --arg user_content "Based on the following git diff output, identify and describe the changes, then summarise the describing to define the full commit message in JSON format: $DIFF_OUTPUT" \
                   '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
 
