@@ -42,8 +42,8 @@ DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
                   --arg model "gpt-3.5-turbo-16k" \
-                  --arg sys_content "You are a helpful assistant." \
-                  --arg user_content "Based on the following git diff output, suggest a semantic versioning tag for the commit: $DIFF_OUTPUT" \
+                  --arg sys_content "You are a helpful system that creates content in JSON format, your task is for determining the commit type, scope, subject, body, and footer, as well as formatting and writing the commit message to the commit message file." \
+                  --arg user_content "Based on the following git diff output, identify and describe the changes, then summarise the describing to define the full commit message in JSON format: $DIFF_OUTPUT" \
                   '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
 
 # Make an API call to ChatGPT for analysis
