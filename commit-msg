@@ -2,7 +2,7 @@
 # Author: Ricardo Malnati
 # Creation Date: 2023-10-10
 # Description: To analyze the commit content and suggest a semantic versioning tag.
-# Dependencies: curl, jq, base64
+# Dependencies: curl, jq
 
 # Set API Key
 API_KEY="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"
@@ -42,7 +42,7 @@ DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
                   --arg model "gpt-3.5-turbo-16k" \
-                  --arg sys_content "You are a helpful system programmed to generate a JSON-formatted commit message based on git diff output. Please provide only the JSON object containing the commit type, scope, subject, body, and footer. The JSON should be a single line, without any newline or escape characters." \
+                  --arg sys_content "You are a helpful system programmed to generate a JSON-formatted commit message based on git diff output. Please provide only the JSON object containing the commit type, scope, subject, body, and footer. End of Line marks are not desired, without any newline or escape characters." \
                   --arg user_content "Based on the following git diff output, identify and describe the changes, then summarise the describing to define the full commit message in JSON format: $DIFF_OUTPUT" \
                   '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
 
@@ -73,20 +73,3 @@ echo "Debug: COMMIT_SCOPE: $COMMIT_SCOPE"
 echo "Debug: COMMIT_FOOTER: $COMMIT_FOOTER"
 
 exit 0
-# Now, you can use these variables in your logic
-
-# Extract the suggestion from the API response
-SEMVER_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
-
-# Check if SEMVER_SUGGESTION is empty
-if [ -z "$SEMVER_SUGGESTION" ]; then
-    echo "Error: Semantic versioning suggestion is empty."
-    exit 1
-fi
-
-# Append the semantic versioning suggestion to the original commit message
-echo "$ORIGINAL_COMMIT_MSG ($SEMVER_SUGGESTION)" > "$COMMIT_MSG_FILE"
-if [ $? -ne 0 ]; then
-    echo "Error: Could not write to commit message file."
-    exit 1
-fi
