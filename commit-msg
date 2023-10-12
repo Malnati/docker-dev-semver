@@ -59,7 +59,7 @@ echo "Debug: Entire API Response: $API_RESPONSE"
 COMMIT_JSON=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
 
 # Parse the JSON to populate the variables
-COMMIT_TYPE=$(echo "$COMMIT_JSON" | jq -r '.type')
+COMMIT_TYPE=$COMMIT_JSON
 
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
@@ -81,7 +81,7 @@ echo "Debug: Entire API Response: $API_RESPONSE"
 COMMIT_JSON=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
 
 # Parse the JSON to populate the variables
-COMMIT_SCOPE=$(echo "$COMMIT_JSON" | jq -r '.scope')
+COMMIT_SCOPE=$COMMIT_JSON
 
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
@@ -100,7 +100,7 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
 echo "Debug: Entire API Response: $API_RESPONSE"
 
 # Parse the JSON to populate the variables
-COMMIT_FOOTER=$(echo "$COMMIT_JSON" | jq -r '.footer')
+COMMIT_FOOTER=$COMMIT_JSON
 
 # Update the commit message
 echo "$COMMIT_TYPE: $COMMIT_SCOPE - $COMMIT_FOOTER" > "$COMMIT_MSG_FILE"
