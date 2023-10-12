@@ -43,7 +43,7 @@ DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
 JSON_PAYLOAD=$(jq -n \
                   --arg model "gpt-3.5-turbo-16k" \
                   --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a short sentence of one line with maximun of 1024 characteres." \
-                  --arg user_content "Based on the following git diff output, identify and describe the changes to define the type of the commit message in JSON format: $DIFF_OUTPUT" \
+                  --arg user_content "Based on the following git diff output, identify and describe the changes to define the type of the commit message: $DIFF_OUTPUT" \
                   '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
 
 # Make an API call to ChatGPT for analysis
@@ -65,7 +65,7 @@ COMMIT_TYPE=$(echo "$COMMIT_JSON" | jq -r '.type')
 JSON_PAYLOAD=$(jq -n \
                   --arg model "gpt-3.5-turbo-16k" \
                   --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a short sentence of one line with maximun of 1024 characteres." \
-                  --arg user_content "Based on the following git diff output, identify and describe the changes to define the scopr of the commit message in JSON format: $DIFF_OUTPUT" \
+                  --arg user_content "Based on the following git diff output, identify and describe the changes to define the scopr of the commit messaget: $DIFF_OUTPUT" \
                   '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
 
 # Make an API call to ChatGPT for analysis
@@ -87,7 +87,7 @@ COMMIT_SCOPE=$(echo "$COMMIT_JSON" | jq -r '.scope')
 JSON_PAYLOAD=$(jq -n \
                   --arg model "gpt-3.5-turbo-16k" \
                   --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a short sentence of one line with maximun of 1024 characteres." \
-                  --arg user_content "Based on the following git diff output, identify and describe the changes to define the footer of the commit message in JSON format: $DIFF_OUTPUT" \
+                  --arg user_content "Based on the following git diff output, identify and describe the changes to define the footer of the commit message: $DIFF_OUTPUT" \
                   '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
 
 # Make an API call to ChatGPT for analysis
