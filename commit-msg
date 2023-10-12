@@ -1,14 +1,14 @@
 #!/bin/bash
 # Author: Ricardo Malnati
 # Creation Date: 2023-10-10
-# Description: To analyze the commit content and suggest a semantic versioning tag.
+# Description: To analyze the commit content and suggest a semantic versioning message.
 # Dependencies: curl, jq
 
 # Set API Key
 API_KEY="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"
 
 # Verify if required utilities are installed
-for util in curl jq base64; do
+for util in curl jq; do
     if ! command -v $util &> /dev/null; then
         echo "Error: $util is not installed. Exiting."
         exit 1
@@ -25,7 +25,7 @@ fi
 # Capture the original commit message
 ORIGINAL_COMMIT_MSG=$(cat "$COMMIT_MSG_FILE" 2>/dev/null)
 if [ $? -ne 0 ]; then
-    echo "Error: Could not read commit message file."
+    echo "Error: Could not read commit message file at: $COMMIT_MSG_FILE"
     exit 1
 fi
 
@@ -39,34 +39,64 @@ fi
 # Capture the changes staged for commit
 DIFF_OUTPUT=$(git diff --cached --diff-filter=CMRTUXB)
 
+DEFAULT_MODEL="gpt-3.5-turbo-16k"
+DEFAULT_INSTRUCTIONS='{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}'
+DEFAULT_USER_CONTENT_QUESTION="You are a helpful system programmed to generate a commit message based on a description. Please provide the commit type in a short sentence of one line with maximun of 256 characteres."
+
 # Prepare the JSON payload using jq
-JSON_PAYLOAD=$(jq -n \
-                  --arg model "gpt-3.5-turbo-16k" \
-                  --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a short sentence of one line with maximun of 256 characteres." \
-                  --arg user_content "Based on the following git diff output, identify and describe the changes to define the type of the commit message: $DIFF_OUTPUT" \
-                  '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
+JSON_DIFF_OUTPUT_PAYLOAD=$(jq -n \
+                  --arg model $DEFAULT_MODEL \
+                  --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a sentence of one line with maximun of 4096 characteres." \
+                  --arg user_content "Based on the following git diff output, identify and describe the changes to define the commit message: $DIFF_OUTPUT" \
+                  $DEFAULT_INSTRUCTIONS)
 
 # Make an API call to ChatGPT for analysis
-API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bearer $API_KEY" \
+API_FROM_DIFF_OUTPUT_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bearer $API_KEY" \
     -H "Content-Type: application/json" \
-    -d "$JSON_PAYLOAD" \
+    -d "$JSON_DIFF_OUTPUT_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
 
-#echo "Debug
-echo "Debug: JSON to be parsed: $API_RESPONSE"
+#echo "Debug: Response
+echo "Debug: Response: $API_FROM_DIFF_OUTPUT_RESPONSE"
 
 # Extract the commit message from the API response
-COMMIT_JSON=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
+DESCRIPTON_4096_SUGGESTION=$(echo "$API_FROM_DIFF_OUTPUT_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
 
-# Parse the JSON to populate the variables
-COMMIT_TYPE=$COMMIT_JSON
+#echo "Debug: DESCRIPTON_4096_SUGGESTION
+echo "Debug: DESCRIPTON_4096_SUGGESTION: $DESCRIPTON_4096_SUGGESTION"
 
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
-                  --arg model "gpt-3.5-turbo-16k" \
-                  --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a short sentence of one line with maximun of 256 characteres." \
-                  --arg user_content "Based on the following git diff output, identify and describe the changes to define the scopr of the commit messaget: $DIFF_OUTPUT" \
-                  '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
+                  --arg model "$DEFAULT_MODEL" \
+                  --arg sys_content  "$DEFAULT_USER_CONTENT_QUESTION" \
+                  --arg user_content "Based on the following description, identify and describe the changes to define the type of the commit message: $DESCRIPTON_4096_SUGGESTION" \
+                  $DEFAULT_INSTRUCTIONS)
+
+# Make an API call to ChatGPT for analysis
+API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bearer $API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "$JSON_PAYLOAD" \
+    "https://api.openai.com/v1/chat/completions")
+
+
+#echo "Debug: Response
+echo "Debug: Response: $API_RESPONSE"
+
+# Extract the commit type from the API response
+COMMIT_TYPE_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
+
+#echo "Debug: COMMIT_TYPE_SUGGESTION
+echo "Debug: COMMIT_TYPE_SUGGESTION: $COMMIT_TYPE_SUGGESTION"
+
+# Parse the JSON to populate the variables
+COMMIT_TYPE=$COMMIT_TYPE_SUGGESTION
+
+# Prepare the JSON payload using jq
+JSON_PAYLOAD=$(jq -n \
+                  --arg model "$DEFAULT_MODEL" \
+                  --arg sys_content  "$DEFAULT_USER_CONTENT_QUESTION" \
+                  --arg user_content "Based on the following description, identify and describe the changes to define the scope of the commit message: $DESCRIPTON_4096_SUGGESTION" \
+                  $DEFAULT_INSTRUCTIONS)
 
 # Make an API call to ChatGPT for analysis
 API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bearer $API_KEY" \
@@ -77,18 +107,21 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
 #echo "Debug
 echo "Debug: JSON to be parsed: $API_RESPONSE"
 
-# Extract the commit message from the API response
-COMMIT_JSON=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
+# Extract the commit scope from the API response
+COMMIT_SCOPE_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
+
+#echo "Debug: COMMIT_SCOPE_SUGGESTION
+echo "Debug: COMMIT_SCOPE_SUGGESTION: $COMMIT_SCOPE_SUGGESTION"
 
 # Parse the JSON to populate the variables
-COMMIT_SCOPE=$COMMIT_JSON
+COMMIT_SCOPE=$COMMIT_SCOPE_SUGGESTION
 
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
-                  --arg model "gpt-3.5-turbo-16k" \
-                  --arg sys_content "You are a helpful system programmed to generate a commit message based on git diff output. Please provide the commit type, scope, subject, body, and footer in a short sentence of one line with maximun of 1024 characteres." \
-                  --arg user_content "Based on the following git diff output, identify and describe the changes to define the footer of the commit message: $DIFF_OUTPUT" \
-                  '{model: $model, messages: [{role: "system", content: $sys_content}, {role: "user", content: $user_content}]}')
+                  --arg model "$DEFAULT_MODEL" \
+                  --arg sys_content  "$DEFAULT_USER_CONTENT_QUESTION" \
+                  --arg user_content "Based on the following description, identify and describe the changes to define the footer of the commit message: $DESCRIPTON_4096_SUGGESTION" \
+                  $DEFAULT_INSTRUCTIONS)
 
 # Make an API call to ChatGPT for analysis
 API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bearer $API_KEY" \
@@ -99,8 +132,14 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
 #echo "Debug
 echo "Debug: JSON to be parsed: $API_RESPONSE"
 
+# Extract the commit footer from the API response
+COMMIT_FOOTER_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
+
+#echo "Debug: COMMIT_FOOTER_SUGGESTION
+echo "Debug: COMMIT_FOOTER_SUGGESTION: $COMMIT_FOOTER_SUGGESTION"
+
 # Parse the JSON to populate the variables
-COMMIT_FOOTER=$COMMIT_JSON
+COMMIT_FOOTER=$COMMIT_FOOTER_SUGGESTION
 
 if [ "$COMMIT_TYPE" == "feat" ]; then
     SEMVER="minor"
