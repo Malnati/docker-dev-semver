@@ -59,7 +59,9 @@ API_FROM_DIFF_OUTPUT_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Au
 DESCRIPTON_4096_SUGGESTION=$(echo "$API_FROM_DIFF_OUTPUT_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
 
 #echo "Debug: DESCRIPTON_4096_SUGGESTION
-echo "Debug: DESCRIPTON_4096_SUGGESTION:$DESCRIPTON_4096_SUGGESTION"
+echo "Begin Debug: DESCRIPTON_4096_SUGGESTION:"
+echo $DESCRIPTON_4096_SUGGESTION
+echo "End Debug: DESCRIPTON_4096_SUGGESTION"
 
 # Prepare the JSON payload using jq
 JSON_PAYLOAD=$(jq -n \
@@ -74,14 +76,13 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
 
-#echo "End Debug: DESCRIPTON_4096_SUGGESTION
-echo "End Debug: DESCRIPTON_4096_SUGGESTION"
-
 # Extract the commit type from the API response
 COMMIT_TYPE_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
 
 #echo "Debug: COMMIT_TYPE_SUGGESTION
-echo "Debug: COMMIT_TYPE_SUGGESTION:$COMMIT_TYPE_SUGGESTION"
+echo "Begin Debug: COMMIT_TYPE_SUGGESTION:"
+echo $COMMIT_TYPE_SUGGESTION
+echo "End Debug: COMMIT_TYPE_SUGGESTION"
 
 # Parse the JSON to populate the variables
 COMMIT_TYPE=$COMMIT_TYPE_SUGGESTION
@@ -99,14 +100,13 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
 
-#echo "End Debug: DESCRIPTON_4096_SUGGESTION
-echo "End Debug: DESCRIPTON_4096_SUGGESTION"
-
 # Extract the commit scope from the API response
 COMMIT_SCOPE_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
 
 #echo "Debug: COMMIT_SCOPE_SUGGESTION
-echo "Debug: COMMIT_SCOPE_SUGGESTION:$COMMIT_SCOPE_SUGGESTION"
+echo "Begin Debug: COMMIT_SCOPE_SUGGESTION:"
+echo $COMMIT_SCOPE_SUGGESTION
+echo "End Debug: COMMIT_SCOPE_SUGGESTION"
 
 # Parse the JSON to populate the variables
 COMMIT_SCOPE=$COMMIT_SCOPE_SUGGESTION
@@ -124,14 +124,13 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
     -d "$JSON_PAYLOAD" \
     "https://api.openai.com/v1/chat/completions")
 
-#echo "End Debug: DESCRIPTON_4096_SUGGESTION
-echo "End Debug: DESCRIPTON_4096_SUGGESTION"
-
 # Extract the commit footer from the API response
 COMMIT_FOOTER_SUGGESTION=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null)
 
 #echo "Debug: COMMIT_FOOTER_SUGGESTION
-echo "Debug: COMMIT_FOOTER_SUGGESTION:$COMMIT_FOOTER_SUGGESTION"
+echo "Debug: COMMIT_FOOTER_SUGGESTION:"
+echo $COMMIT_FOOTER_SUGGESTION
+echo "Debug: COMMIT_FOOTER_SUGGESTION"
 
 # Parse the JSON to populate the variables
 COMMIT_FOOTER=$COMMIT_FOOTER_SUGGESTION
