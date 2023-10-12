@@ -54,19 +54,23 @@ API_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -H "Authorization: Bear
 
 #echo "Debug
 echo "Debug: Entire API Request: $JSON_PAYLOAD"
-echo "Debug: Entire API Response: $API_RESPONSE"
+# Debug: Pretty-print the API response to check for well-formed JSON
+echo "Debug: Pretty-Print API Response:"
+echo "$API_RESPONSE" | jq .
 
-# Extract the JSON-formatted commit message from the API response
-COMMIT_JSON=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content')
+# Debug: Extract the JSON-formatted commit message and print it
+COMMIT_JSON=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content' 2>&1)
+echo "Debug: Extracted Commit JSON: $COMMIT_JSON"
 
 # Parse the JSON to populate the variables
-COMMIT_TYPE=$(echo "$COMMIT_JSON" | jq -r '.type')
-COMMIT_SCOPE=$(echo "$COMMIT_JSON" | jq -r '.scope')
-COMMIT_FOOTER=$(echo "$COMMIT_JSON" | jq -r '.footer')
+COMMIT_TYPE=$(echo "$COMMIT_JSON" | jq -r '.type' 2>&1)
+COMMIT_SCOPE=$(echo "$COMMIT_JSON" | jq -r '.scope' 2>&1)
+COMMIT_FOOTER=$(echo "$COMMIT_JSON" | jq -r '.footer' 2>&1)
 
-echo "COMMIT_TYPE: $COMMIT_TYPE"
-echo "COMMIT_SCOPE $COMMIT_SCOPE"
-echo "COMMIT_FOOTER $COMMIT_FOOTER"
+# Debug: Print the parsed variables
+echo "Debug: COMMIT_TYPE: $COMMIT_TYPE"
+echo "Debug: COMMIT_SCOPE: $COMMIT_SCOPE"
+echo "Debug: COMMIT_FOOTER: $COMMIT_FOOTER"
 
 exit 0
 # Now, you can use these variables in your logic
